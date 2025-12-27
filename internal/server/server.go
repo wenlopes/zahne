@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"zahne/internal/database"
+	"zahne/pkg/database"
 )
 
 type Server struct {
