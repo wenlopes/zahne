@@ -1,4 +1,4 @@
-package server
+package restapi
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"zahne/pkg/database"
+	database "zahne/pkg/postgres"
 )
 
 type Server struct {
