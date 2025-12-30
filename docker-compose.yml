@@ -1,18 +1,15 @@
 services:
-  localstack:
-    container_name: ${LOCALSTACK_DOCKER_NAME:-localstack_main}
-    image: localstack/localstack:latest
+  psql_bp:
+    image: postgres:latest
+    restart: unless-stopped
     environment:
-      - SERVICES=dynamodb
-      - DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-test}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-test}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      POSTGRES_DB: ${BLUEPRINT_DB_DATABASE}
+      POSTGRES_USER: ${BLUEPRINT_DB_USERNAME}
+      POSTGRES_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
     ports:
-      - "4566:4566"
+      - "${BLUEPRINT_DB_PORT}:5432"
     volumes:
-      - localstack_data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - psql_volume_bp:/var/lib/postgresql/data
 
 volumes:
-  localstack_data:
+  psql_volume_bp:
