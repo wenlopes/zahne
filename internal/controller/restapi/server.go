@@ -9,19 +9,19 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"zahne/pkg/dynamo"
+	"zahne/pkg/postgres"
 )
 
 type Server struct {
 	port int
-	db   dynamo.Service
+	db   postgres.Service
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port: port,
-		db:   dynamo.New(),
+		db:   postgres.New(),
 	}
 
 	// Declare Server config
