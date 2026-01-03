@@ -7,21 +7,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
-
-	v1 "zahne/internal/controller/restapi/v1"
-	"zahne/internal/repository/persistent"
-	"zahne/internal/usecase/patient"
 )
 
-// setupTestDatabase creates a PostgreSQL testcontainer and returns the database connection
+// SetupTestDatabase creates a PostgreSQL testcontainer and returns the database connection
 // along with a cleanup function to terminate the container
-func SetupTestDatabase(t *testing.T) (*sql.DB, func()) {
+func SetupTestDB(t *testing.T) (*sql.DB, func()) {
 	ctx := context.Background()
 
 	dbName := "testdb"
@@ -87,25 +82,4 @@ func SetupTestDatabase(t *testing.T) (*sql.DB, func()) {
 	}
 
 	return db, cleanup
-}
-
-// setupPatientRouter creates a Gin router with patient endpoints configured
-func SetupPatientRouter(db *sql.DB) *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
-
-	patientRepo := persistent.NewPatientRepository(db)
-	patientUseCase := patient.New(patientRepo)
-	patientHandler := v1.NewPatientHandler(patientUseCase)
-
-	apiV1 := router.Group("/api/v1")
-	{
-		apiV1.POST("/patient", patientHandler.Create)
-		apiV1.GET("/patient/:id", patientHandler.Get)
-		apiV1.GET("/patients", patientHandler.GetAll)
-		apiV1.PUT("/patient/:id", patientHandler.Update)
-		apiV1.DELETE("/patient/:id", patientHandler.Delete)
-	}
-
-	return router
 }

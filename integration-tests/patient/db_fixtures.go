@@ -1,4 +1,4 @@
-package shared
+package patient
 
 import (
 	"database/sql"
@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// testPatientData represents patient data used in tests
+// TestPatientData represents patient data used in tests
 type TestPatientData struct {
 	ID          string
 	Name        string
@@ -16,7 +16,7 @@ type TestPatientData struct {
 	DateOfBirth time.Time
 }
 
-// insertTestPatient inserts a test patient into the database
+// InsertTestPatient inserts a test patient into the database
 func InsertTestPatient(t *testing.T, db *sql.DB, patient TestPatientData) {
 	query := `
 		INSERT INTO patients (id, name, cpf, phone, email, date_of_birth, created_at, updated_at)
