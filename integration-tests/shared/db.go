@@ -14,7 +14,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// setupTestDatabase creates a PostgreSQL testcontainer and returns the database connection
+// SetupTestDatabase creates a PostgreSQL testcontainer and returns the database connection
 // along with a cleanup function to terminate the container
 func SetupTestDB(t *testing.T) (*sql.DB, func()) {
 	ctx := context.Background()
