@@ -1,10 +1,11 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
 	"zahne/internal/repository/persistent"
 	"zahne/internal/usecase/patient"
 	"zahne/pkg/postgres"
+
+	"github.com/gin-gonic/gin"
 )
 
 func NewRouter(r *gin.Engine, dbService postgres.Service) {
@@ -18,18 +19,10 @@ func NewRouter(r *gin.Engine, dbService postgres.Service) {
 	patientUseCase := patient.New(patientRepo)
 
 	// Initialize handlers
-	dentistHandler := NewDentistHandler()
 	patientHandler := NewPatientHandler(patientUseCase)
 
 	apiV1 := r.Group("/api/v1")
 	{
-		// Hello World route
-		apiV1.GET("/hello", HelloWorldHandler)
-
-		// Dentist routes
-		apiV1.POST("/dentist", dentistHandler.Create)
-		apiV1.GET("/dentist/:id", dentistHandler.Get)
-
 		// Patient routes
 		apiV1.POST("/patient", patientHandler.Create)
 		apiV1.GET("/patient/:id", patientHandler.Get)
