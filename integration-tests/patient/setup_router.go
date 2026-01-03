@@ -2,12 +2,12 @@ package patient
 
 import (
 	"database/sql"
-	v1 "zahne/internal/controller/restapi/v1"
-
-	"zahne/internal/repository/persistent"
-	"zahne/internal/usecase/patient"
 
 	"github.com/gin-gonic/gin"
+
+	v1 "zahne/internal/controller/restapi/v1"
+	"zahne/internal/repository/persistent"
+	"zahne/internal/usecase/patient"
 )
 
 // setupRouter creates a Gin router with patient endpoints configured
