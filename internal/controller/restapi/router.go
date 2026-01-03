@@ -22,7 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/health", s.healthHandler)
 
 	// Routers
-	v1.NewRouter(r)
+	v1.NewRouter(r, s.db)
 	return r
 }
 
