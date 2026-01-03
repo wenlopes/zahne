@@ -1,4 +1,4 @@
-package integration_tests
+package patient
 
 import (
 	"encoding/json"
@@ -11,17 +11,18 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
+	"zahne/integration-tests/shared"
 	"zahne/internal/entity"
 )
 
 func TestGetPatientByID_Success(t *testing.T) {
-	db, cleanup := setupTestDatabase(t)
+	db, cleanup := shared.SetupTestDatabase(t)
 	defer cleanup()
 
-	router := setupPatientRouter(db)
+	router := shared.SetupPatientRouter(db)
 
 	// Create test patient data
-	testPatient := testPatientData{
+	testPatient := shared.TestPatientData{
 		ID:          uuid.New().String(),
 		Name:        "John Doe",
 		CPF:         "12345678901",
@@ -30,7 +31,7 @@ func TestGetPatientByID_Success(t *testing.T) {
 		DateOfBirth: time.Date(1990, 1, 15, 0, 0, 0, 0, time.UTC),
 	}
 
-	insertTestPatient(t, db, testPatient)
+	shared.InsertTestPatient(t, db, testPatient)
 
 	// Make GET request
 	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/patient/%s", testPatient.ID), nil)
@@ -53,10 +54,10 @@ func TestGetPatientByID_Success(t *testing.T) {
 }
 
 func TestGetPatientByID_NotFound(t *testing.T) {
-	db, cleanup := setupTestDatabase(t)
+	db, cleanup := shared.SetupTestDatabase(t)
 	defer cleanup()
 
-	router := setupPatientRouter(db)
+	router := shared.SetupPatientRouter(db)
 
 	// Use a random UUID that doesn't exist in the database
 	nonExistentID := uuid.New().String()
@@ -76,10 +77,10 @@ func TestGetPatientByID_NotFound(t *testing.T) {
 }
 
 func TestGetPatientByID_EmptyID(t *testing.T) {
-	db, cleanup := setupTestDatabase(t)
+	db, cleanup := shared.SetupTestDatabase(t)
 	defer cleanup()
 
-	router := setupPatientRouter(db)
+	router := shared.SetupPatientRouter(db)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/patient/", nil)
 	w := httptest.NewRecorder()

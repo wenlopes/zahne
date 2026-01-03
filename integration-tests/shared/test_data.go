@@ -1,4 +1,4 @@
-package integration_tests
+package shared
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 )
 
 // testPatientData represents patient data used in tests
-type testPatientData struct {
+type TestPatientData struct {
 	ID          string
 	Name        string
 	CPF         string
@@ -17,7 +17,7 @@ type testPatientData struct {
 }
 
 // insertTestPatient inserts a test patient into the database
-func insertTestPatient(t *testing.T, db *sql.DB, patient testPatientData) {
+func InsertTestPatient(t *testing.T, db *sql.DB, patient TestPatientData) {
 	query := `
 		INSERT INTO patients (id, name, cpf, phone, email, date_of_birth, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)

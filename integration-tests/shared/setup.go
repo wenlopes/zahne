@@ -1,4 +1,4 @@
-package integration_tests
+package shared
 
 import (
 	"context"
@@ -14,14 +14,14 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"zahne/internal/controller/restapi/v1"
+	v1 "zahne/internal/controller/restapi/v1"
 	"zahne/internal/repository/persistent"
 	"zahne/internal/usecase/patient"
 )
 
 // setupTestDatabase creates a PostgreSQL testcontainer and returns the database connection
 // along with a cleanup function to terminate the container
-func setupTestDatabase(t *testing.T) (*sql.DB, func()) {
+func SetupTestDatabase(t *testing.T) (*sql.DB, func()) {
 	ctx := context.Background()
 
 	dbName := "testdb"
@@ -90,7 +90,7 @@ func setupTestDatabase(t *testing.T) (*sql.DB, func()) {
 }
 
 // setupPatientRouter creates a Gin router with patient endpoints configured
-func setupPatientRouter(db *sql.DB) *gin.Engine {
+func SetupPatientRouter(db *sql.DB) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
