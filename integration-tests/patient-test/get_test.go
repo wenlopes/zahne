@@ -1,4 +1,4 @@
-package patient
+package patient_test
 
 import (
 	"encoding/json"
