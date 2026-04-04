@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	v1 "zahne/internal/controller/restapi/v1"
-	"zahne/internal/repository/persistent"
-	"zahne/internal/usecase/patient"
+	"zahne/patient"
+	patientpostgres "zahne/patient/postgres"
 )
 
 // setupRouter creates a Gin router with patient endpoints configured
@@ -15,8 +15,8 @@ func setupRouter(db *sql.DB) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	patientRepo := persistent.NewPatientRepository(db)
-	patientUseCase := patient.New(patientRepo)
+	patientRepo := patientpostgres.NewRepository(db)
+	patientUseCase := patient.NewService(patientRepo)
 	patientHandler := v1.NewPatientHandler(patientUseCase)
 
 	apiV1 := router.Group("/api/v1")

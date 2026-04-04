@@ -1,18 +1,21 @@
 package v1
 
 import (
+	"log/slog"
 	"net/http"
+	"strconv"
+
+	"zahne/internal/controller/restapi/v1/request"
+	"zahne/patient"
 
 	"github.com/gin-gonic/gin"
-	"zahne/internal/controller/restapi/v1/request"
-	"zahne/internal/usecase"
 )
 
 type PatientHandler struct {
-	patientUseCase usecase.PatientUseCase
+	patientUseCase patient.PatientUseCase
 }
 
-func NewPatientHandler(patientUseCase usecase.PatientUseCase) *PatientHandler {
+func NewPatientHandler(patientUseCase patient.PatientUseCase) *PatientHandler {
 	return &PatientHandler{
 		patientUseCase: patientUseCase,
 	}
@@ -29,41 +32,49 @@ func (h *PatientHandler) Create(c *gin.Context) {
 		return
 	}
 
-	patient, err := h.patientUseCase.CreatePatient(
-		req.Name,
-		req.CPF,
-		req.Phone,
-		req.Email,
-		req.DateOfBirth,
-	)
+	p, err := h.patientUseCase.CreatePatient(c.Request.Context(), patient.CreatePatientInput{
+		Name:        req.Name,
+		CPF:         req.CPF,
+		Phone:       req.Phone,
+		Email:       req.Email,
+		DateOfBirth: req.DateOfBirth,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		slog.Error("failed to create patient", "err", err, slog.String("operation", "create_patient"))
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "internal server error"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, patient)
+	c.JSON(http.StatusCreated, p)
 }
 
 func (h *PatientHandler) Get(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	rawID := c.Param("id")
+	if rawID == "" {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id is required"})
 		return
 	}
 
-	patient, err := h.patientUseCase.GetPatientByID(id)
+	id, err := strconv.Atoi(rawID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id must be a number"})
+		return
+	}
+
+	p, err := h.patientUseCase.GetPatient(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, patient)
+	c.JSON(http.StatusOK, p)
 }
 
 func (h *PatientHandler) GetAll(c *gin.Context) {
-	patients, err := h.patientUseCase.GetAllPatients()
+	patients, err := h.patientUseCase.GetAllPatients(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		slog.Error("failed to get all patients", "err", err, slog.String("operation", "get_all_patients"))
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "internal server error"})
 		return
 	}
 
@@ -71,9 +82,15 @@ func (h *PatientHandler) GetAll(c *gin.Context) {
 }
 
 func (h *PatientHandler) Update(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	rawID := c.Param("id")
+	if rawID == "" {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id is required"})
+		return
+	}
+
+	id, err := strconv.Atoi(rawID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id must be a number"})
 		return
 	}
 
@@ -83,32 +100,39 @@ func (h *PatientHandler) Update(c *gin.Context) {
 		return
 	}
 
-	patient, err := h.patientUseCase.UpdatePatient(
-		id,
-		req.Name,
-		req.CPF,
-		req.Phone,
-		req.Email,
-		req.DateOfBirth,
-	)
+	p, err := h.patientUseCase.UpdatePatient(c.Request.Context(), patient.UpdatePatientInput{
+		ID:          id,
+		Name:        req.Name,
+		CPF:         req.CPF,
+		Phone:       req.Phone,
+		Email:       req.Email,
+		DateOfBirth: req.DateOfBirth,
+	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		slog.Error("failed to update patient", "err", err, slog.Int("patient_id", id), slog.String("operation", "update_patient"))
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "internal server error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, patient)
+	c.JSON(http.StatusOK, p)
 }
 
 func (h *PatientHandler) Delete(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
+	rawID := c.Param("id")
+	if rawID == "" {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id is required"})
 		return
 	}
 
-	err := h.patientUseCase.DeletePatient(id)
+	id, err := strconv.Atoi(rawID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "id must be a number"})
+		return
+	}
+
+	if err := h.patientUseCase.DeletePatient(c.Request.Context(), id); err != nil {
+		slog.Error("failed to delete patient", "err", err, slog.Int("patient_id", id), slog.String("operation", "delete_patient"))
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "internal server error"})
 		return
 	}
 

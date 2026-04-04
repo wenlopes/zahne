@@ -41,6 +41,26 @@ itest:
 	@echo "Running integration tests..."
 	@go test ./internal/database -v
 
+# Generate mocks using go generate (requires mockgen)
+mocks:
+	@echo "Generating mocks..."
+	@go generate ./...
+
+# Tidy go modules
+tidy:
+	@echo "Tidying modules..."
+	@go mod tidy
+
+# Run linter (requires golangci-lint)
+lint:
+	@echo "Linting..."
+	@golangci-lint run ./...
+
+# Build Go documentation
+docs-build:
+	@echo "Building docs..."
+	@go doc ./...
+
 # Clean the binary
 clean:
 	@echo "Cleaning..."
@@ -63,4 +83,4 @@ watch:
             fi; \
         fi
 
-.PHONY: all build run test clean watch docker-run docker-down itest
+.PHONY: all build run test clean watch docker-run docker-down itest mocks tidy lint docs-build
