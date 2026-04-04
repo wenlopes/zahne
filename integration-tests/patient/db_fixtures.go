@@ -8,7 +8,7 @@ import (
 
 // TestPatientData represents patient data used in tests
 type TestPatientData struct {
-	ID          string
+	ID          int
 	Name        string
 	CPF         string
 	Phone       string
@@ -16,23 +16,21 @@ type TestPatientData struct {
 	DateOfBirth time.Time
 }
 
-// InsertTestPatient inserts a test patient into the database
-func InsertTestPatient(t *testing.T, db *sql.DB, patient TestPatientData) {
+// InsertTestPatient inserts a test patient into the database and sets the auto-generated ID on the data.
+func InsertTestPatient(t *testing.T, db *sql.DB, data *TestPatientData) {
+	t.Helper()
 	query := `
-		INSERT INTO patients (id, name, cpf, phone, email, date_of_birth, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		INSERT INTO patients (name, cpf, phone, email, date_of_birth)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
 	`
-	now := time.Now()
-	_, err := db.Exec(query,
-		patient.ID,
-		patient.Name,
-		patient.CPF,
-		patient.Phone,
-		patient.Email,
-		patient.DateOfBirth,
-		now,
-		now,
-	)
+	err := db.QueryRow(query,
+		data.Name,
+		data.CPF,
+		data.Phone,
+		data.Email,
+		data.DateOfBirth,
+	).Scan(&data.ID)
 	if err != nil {
 		t.Fatalf("failed to insert test patient: %v", err)
 	}

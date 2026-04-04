@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"zahne/internal/repository/persistent"
-	"zahne/internal/usecase/patient"
+	"zahne/patient"
+	patientpostgres "zahne/patient/postgres"
 	"zahne/pkg/postgres"
 
 	"github.com/gin-gonic/gin"
@@ -13,10 +13,10 @@ func NewRouter(r *gin.Engine, dbService postgres.Service) {
 	db := dbService.GetDB()
 
 	// Initialize repositories
-	patientRepo := persistent.NewPatientRepository(db)
+	patientRepo := patientpostgres.NewRepository(db)
 
 	// Initialize use cases
-	patientUseCase := patient.New(patientRepo)
+	patientUseCase := patient.NewService(patientRepo)
 
 	// Initialize handlers
 	patientHandler := NewPatientHandler(patientUseCase)

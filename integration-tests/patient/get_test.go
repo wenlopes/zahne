@@ -8,11 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"zahne/integration-tests/shared"
-	"zahne/internal/entity"
+	"zahne/patient"
 )
 
 func TestGetPatientByID_Success(t *testing.T) {
@@ -22,8 +21,7 @@ func TestGetPatientByID_Success(t *testing.T) {
 	router := setupRouter(db)
 
 	// Create test patient data
-	testPatient := TestPatientData{
-		ID:          uuid.New().String(),
+	testPatient := &TestPatientData{
 		Name:        "John Doe",
 		CPF:         "12345678901",
 		Phone:       "11999999999",
@@ -34,14 +32,14 @@ func TestGetPatientByID_Success(t *testing.T) {
 	InsertTestPatient(t, db, testPatient)
 
 	// Make GET request
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/patient/%s", testPatient.ID), nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/patient/%d", testPatient.ID), nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
 	// Assert response
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var response entity.Patient
+	var response patient.Patient
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 
@@ -59,10 +57,8 @@ func TestGetPatientByID_NotFound(t *testing.T) {
 
 	router := setupRouter(db)
 
-	// Use a random UUID that doesn't exist in the database
-	nonExistentID := uuid.New().String()
-
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/patient/%s", nonExistentID), nil)
+	// Use an ID that doesn't exist in the database
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/patient/999999", nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 

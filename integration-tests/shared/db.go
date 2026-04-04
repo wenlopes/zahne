@@ -59,14 +59,14 @@ func SetupTestDB(t *testing.T) (*sql.DB, func()) {
 	// Create patients table
 	createTableQuery := `
 		CREATE TABLE IF NOT EXISTS patients (
-			id VARCHAR(255) PRIMARY KEY,
+			id SERIAL PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
 			cpf VARCHAR(255) NOT NULL,
 			phone VARCHAR(255),
 			email VARCHAR(255),
 			date_of_birth TIMESTAMP NOT NULL,
-			created_at TIMESTAMP NOT NULL,
-			updated_at TIMESTAMP NOT NULL
+			created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+			updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 		);
 	`
 	_, err = db.Exec(createTableQuery)
