@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 
-	"zahne/internal/controller/restapi/v1/request"
 	"zahne/patient"
 
 	"github.com/gin-gonic/gin"
@@ -25,8 +25,24 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type createPatientRequest struct {
+	Name        string    `json:"name" binding:"required"`
+	CPF         string    `json:"cpf" binding:"required"`
+	Phone       string    `json:"phone" binding:"required"`
+	Email       string    `json:"email" binding:"required,email"`
+	DateOfBirth time.Time `json:"date_of_birth" binding:"required"`
+}
+
+type updatePatientRequest struct {
+	Name        string    `json:"name" binding:"required"`
+	CPF         string    `json:"cpf" binding:"required"`
+	Phone       string    `json:"phone" binding:"required"`
+	Email       string    `json:"email" binding:"required,email"`
+	DateOfBirth time.Time `json:"date_of_birth" binding:"required"`
+}
+
 func (h *PatientHandler) Create(c *gin.Context) {
-	var req request.CreatePatientRequest
+	var req createPatientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
@@ -94,7 +110,7 @@ func (h *PatientHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req request.UpdatePatientRequest
+	var req updatePatientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
