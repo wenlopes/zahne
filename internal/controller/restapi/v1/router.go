@@ -3,7 +3,7 @@ package v1
 import (
 	"zahne/patient"
 	patientpostgres "zahne/patient/postgres"
-	"zahne/pkg/postgres"
+	"zahne/internal/postgres"
 
 	"github.com/gin-gonic/gin"
 )
