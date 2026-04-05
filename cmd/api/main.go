@@ -10,8 +10,8 @@ import (
 	"time"
 
 	ginhttp "zahne/internal/http/gin"
+	server "zahne/internal/http"
 	"zahne/internal/postgres"
-	"zahne/internal/server"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
