@@ -27,6 +27,8 @@ type Service interface {
 	GetDB() *sql.DB
 }
 
+var _ Service = (*service)(nil)
+
 type service struct {
 	db *sql.DB
 }
@@ -41,6 +43,7 @@ var (
 	dbInstance *service
 )
 
+// New creates a new database service, reusing an existing connection if available.
 func New() Service {
 	// Reuse Connection
 	if dbInstance != nil {

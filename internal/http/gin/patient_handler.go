@@ -1,32 +1,52 @@
-package v1
+package ginhttp
 
 import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"time"
 
-	"zahne/internal/controller/restapi/v1/request"
 	"zahne/patient"
 
 	"github.com/gin-gonic/gin"
 )
 
+// PatientHandler handles HTTP requests for patient operations.
 type PatientHandler struct {
 	patientUseCase patient.PatientUseCase
 }
 
+// NewPatientHandler creates a new PatientHandler with the given use case.
 func NewPatientHandler(patientUseCase patient.PatientUseCase) *PatientHandler {
 	return &PatientHandler{
 		patientUseCase: patientUseCase,
 	}
 }
 
+// ErrorResponse is the standard error response body.
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type createPatientRequest struct {
+	Name        string    `json:"name" binding:"required"`
+	CPF         string    `json:"cpf" binding:"required"`
+	Phone       string    `json:"phone" binding:"required"`
+	Email       string    `json:"email" binding:"required,email"`
+	DateOfBirth time.Time `json:"date_of_birth" binding:"required"`
+}
+
+type updatePatientRequest struct {
+	Name        string    `json:"name" binding:"required"`
+	CPF         string    `json:"cpf" binding:"required"`
+	Phone       string    `json:"phone" binding:"required"`
+	Email       string    `json:"email" binding:"required,email"`
+	DateOfBirth time.Time `json:"date_of_birth" binding:"required"`
+}
+
+// Create handles POST /patient.
 func (h *PatientHandler) Create(c *gin.Context) {
-	var req request.CreatePatientRequest
+	var req createPatientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
@@ -48,6 +68,7 @@ func (h *PatientHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, p)
 }
 
+// Get handles GET /patient/:id.
 func (h *PatientHandler) Get(c *gin.Context) {
 	rawID := c.Param("id")
 	if rawID == "" {
@@ -70,6 +91,7 @@ func (h *PatientHandler) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, p)
 }
 
+// GetAll handles GET /patients.
 func (h *PatientHandler) GetAll(c *gin.Context) {
 	patients, err := h.patientUseCase.GetAllPatients(c.Request.Context())
 	if err != nil {
@@ -81,6 +103,7 @@ func (h *PatientHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, patients)
 }
 
+// Update handles PUT /patient/:id.
 func (h *PatientHandler) Update(c *gin.Context) {
 	rawID := c.Param("id")
 	if rawID == "" {
@@ -94,7 +117,7 @@ func (h *PatientHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req request.UpdatePatientRequest
+	var req updatePatientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
@@ -117,6 +140,7 @@ func (h *PatientHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, p)
 }
 
+// Delete handles DELETE /patient/:id.
 func (h *PatientHandler) Delete(c *gin.Context) {
 	rawID := c.Param("id")
 	if rawID == "" {
